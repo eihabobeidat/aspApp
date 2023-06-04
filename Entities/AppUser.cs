@@ -1,8 +1,40 @@
-﻿namespace API.Entities
+﻿using API.Extensions;
+using Microsoft.AspNetCore.Identity;
+
+namespace API.Entities
 {
-    public class AppUser
+    public class AppUser : IdentityUser<int>
     {
-        public int Id { get; set; }
-        public string UserName { get; set; }
+        
+        public DateOnly DateOfBirth { get; set; }
+        public string KnownAs { get; set; }
+        public DateTime Created { get; set; } = DateTime.UtcNow;
+        public DateTime LastActive { get; set; } = DateTime.UtcNow;
+        public string Gender { get; set; }
+        public string Introduction { get; set; }
+        public string LookingFor { get; set; }
+        public string Interests { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+        //the below property since it is refering to other table
+        //and the table's data can be accessed by it,
+        //it is called navigation property,
+        //this is what makes EF determie the relationship between our tables
+        //and this will add an on delete behavior (most likely cascade)
+        public List<Photo> Photos { get; set; } = new();
+
+        public List<UserLike> LikedByUsers { get; set; }
+
+        public List<UserLike> LikedUsers { get; set; }
+
+        public List<Message> MessagesSent { get; set; }
+        public List<Message> MessagesReceived { get; set; }
+
+        public ICollection<AppUserRole> UserRoles { get; set; }
+
+        public int GetAge( )
+        {
+            return DateOfBirth.CalculateAge();
+        }
     }
 }
