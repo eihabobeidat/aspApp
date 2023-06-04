@@ -29,12 +29,13 @@ namespace API.Extensions
 
 
             services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IUserRepository, UserRepository>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
             services.AddScoped<IPhotoService, PhotoService>();
+            /*services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ILikeRepository, LikeRepository>();
-            services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();*/
+            services.AddScoped<IUnitOfWork, UnitOfWork>(); //H.C
             services.AddScoped<LogUserActivity>();
 
             services.AddSignalR();

@@ -11,14 +11,12 @@ namespace API.Controllers
     public class AccountController : BaseApiController
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly IUserRepository _userRepository;
         private readonly ITokenService _token;
         private readonly IMapper _mapper;
-        public AccountController( UserManager<AppUser> userManager, IUserRepository userRepository, ITokenService token, IMapper mapper )
+        public AccountController( UserManager<AppUser> userManager, ITokenService token, IMapper mapper )
         {
             _userManager = userManager;
             _token = token;
-            _userRepository = userRepository;
             _mapper = mapper;
         }
         [HttpPost("register")] //api/account/register

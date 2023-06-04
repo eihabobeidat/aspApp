@@ -51,8 +51,6 @@ namespace API.Repository
         public async Task<IEnumerable<MessageDTO>> GetMessageThreadAsync( string currentUsername, string recipientUsername )
         {
             var query = _context.Messages
-                .Include(x => x.Sender).ThenInclude(p => p.Photos)
-                .Include(x => x.Recipient).ThenInclude(p => p.Photos)
                 .Where(m =>
                     ( m.RecipientUserName == currentUsername
                     && !m.RecipientDeleted
@@ -61,12 +59,13 @@ namespace API.Repository
                     ( m.RecipientUserName == recipientUsername
                     && !m.SenderDeleted
                     && m.SenderUserName == currentUsername )
-                );
+                ).OrderBy(x => x.MessageSent)
+                .AsQueryable();
 
-            var messages = await query.OrderBy(x => x.MessageSent).ToListAsync();
+            //var messages = await query.ToListAsync();
 
             // now we will mark these messages as read from the current user side
-            var unreadMessages = messages
+            var unreadMessages = query
                 .Where(x =>
                     x.DateRead == null &&
                     x.RecipientUserName == currentUsername
@@ -78,20 +77,15 @@ namespace API.Repository
                                 {
                                     x.DateRead = DateTime.UtcNow;
                                 });
-                await _context.SaveChangesAsync();
+                //await _context.SaveChangesAsync(); this will destroy the unit of work concept
             }
             // till here __!
-            return _mapper.Map<IEnumerable<MessageDTO>>(messages);
-        }
-
-        public async Task<bool> SaveAllAsync( )
-        {
-            return await _context.SaveChangesAsync() > 0;
+            return await query.ProjectTo<MessageDTO>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
         public void AddGroup( Group group )
         {
-            _context.Groups.Add( group );
+            _context.Groups.Add(group);
         }
 
         public void RemoveConnection( Connection connection )
@@ -101,7 +95,7 @@ namespace API.Repository
 
         public async Task<Connection> GetConnectionAsync( string connectionId )
         {
-            return await _context.Connections.FindAsync( connectionId );
+            return await _context.Connections.FindAsync(connectionId);
         }
 
         public async Task<Group> GetMessageGroupAsync( string groupName )

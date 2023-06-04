@@ -85,11 +85,6 @@ namespace API.Repository
             return await _dataContext.Users.Include(p => p.Photos).ToListAsync();
         }
 
-        public async Task<bool> SaveAllAsync( )
-        {
-            return await _dataContext.SaveChangesAsync() > 0;
-        }
-
         public void Update( AppUser user )
         {
             _dataContext.Entry(user).State = EntityState.Modified;
